@@ -2,13 +2,27 @@ import { PostSegment, Type } from "./PostSegment";
 import { User } from "./User";
 import moment from "moment";
 
+export class StatusFeed{
+  post:string;
+  userAlias:string;
+  timeStamp:number;
+  constructor(post:string, userAlias:string, timeStamp:number){
+    this.post = post;
+    this.userAlias = userAlias;
+    this.timeStamp = timeStamp;
+  }
+}
+
 export class Status {
   private _post: string;
   private _user: User;
   private _timestamp: number;
   private _segments: PostSegment[];
 
-  public constructor(post: string, user: User, timestamp: number) {
+  public constructor(
+    post: string, 
+    user: User, 
+    timestamp: number) {
     this._post = post;
     this._user = user;
     this._timestamp = timestamp;
@@ -76,12 +90,9 @@ export class Status {
       let startIndex = post.indexOf(url, previousStartIndex);
 
       if (startIndex > -1) {
-        // Push the url
         references.push(
           new PostSegment(url, startIndex, startIndex + url.length, Type.url)
         );
-
-        // Move start and previous start past the url
         startIndex = startIndex + url.length;
         previousStartIndex = startIndex;
       }

@@ -1,3 +1,5 @@
+import { UserDto } from "../dto/UserDto";
+
 export class User {
   private _firstName: string;
   private _lastName: string;
@@ -77,5 +79,18 @@ export class User {
 
   public toJson(): string {
     return JSON.stringify(this);
+  }
+
+  public static fromDto(dto:UserDto|null|undefined):User|null{
+    return dto?new User(dto.firstName, dto.lastName, dto.alias, dto.imageUrl):null;
+  }
+
+  public get dto():UserDto{
+    return {
+      firstName:this._firstName,
+      lastName:this._lastName,
+      alias:this.alias,
+      imageUrl:this.imageUrl,
+    }
   }
 }

@@ -32,6 +32,7 @@ const defaultUserInfo: UserInfo = {
   setDisplayedUser: (user) => null,
 };
 
+//here replace UserInfoContext
 export const UserInfoContext: Context<UserInfo> =
   createContext<UserInfo>(defaultUserInfo);
 

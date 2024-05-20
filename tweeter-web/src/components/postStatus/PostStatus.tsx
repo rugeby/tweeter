@@ -1,45 +1,31 @@
 import "./PostStatus.css";
 import { useState } from "react";
-import { useContext } from "react";
-import { UserInfoContext } from "../userInfo/UserInfoProvider";
-import { AuthToken, Status } from "tweeter-shared";
 import useToastListener from "../toaster/ToastListenerHook";
+import UserInfoHook from "../userInfo/UserInfoHook";
+import { PostStatusPresenter, PostStatusView } from "../../presenter/PostStatusPresenter";
+interface Props {
+  presenter?: PostStatusPresenter;
+}
 
-const PostStatus = () => {
+const PostStatus = (props:Props) => {
   const { displayErrorMessage, displayInfoMessage, clearLastInfoMessage } =
     useToastListener();
 
-  const { currentUser, authToken } = useContext(UserInfoContext);
+
+  const { currentUser, authToken } = UserInfoHook();
   const [post, setPost] = useState("");
+  const listener:PostStatusView ={
+    displayErrorMessage:displayErrorMessage,
+    displayInfoMessage:displayInfoMessage,
+    clearLastInfoMessage:clearLastInfoMessage,
+    clearPost : () => setPost(""),
+  }
+
+  const [presenter] = useState(props.presenter?? new PostStatusPresenter(listener));
 
   const submitPost = async (event: React.MouseEvent) => {
     event.preventDefault();
-
-    try {
-      displayInfoMessage("Posting status...", 0);
-
-      let status = new Status(post, currentUser!, Date.now());
-
-      await postStatus(authToken!, status);
-
-      clearLastInfoMessage();
-      setPost("");
-      displayInfoMessage("Status posted!", 2000);
-    } catch (error) {
-      displayErrorMessage(
-        `Failed to post the status because of exception: ${error}`
-      );
-    }
-  };
-
-  const postStatus = async (
-    authToken: AuthToken,
-    newStatus: Status
-  ): Promise<void> => {
-    // Pause so we can see the logging out message. Remove when connected to the server
-    await new Promise((f) => setTimeout(f, 2000));
-
-    // TODO: Call the server to post the status
+    presenter.submitPost(authToken!, post, currentUser!)
   };
 
   const clearPost = (event: React.MouseEvent) => {
@@ -58,6 +44,7 @@ const PostStatus = () => {
           className="form-control"
           id="postStatusTextArea"
           rows={10}
+          aria-label="postStatus"
           placeholder="What's on your mind?"
           value={post}
           onChange={(event) => {
